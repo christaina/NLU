@@ -4,14 +4,10 @@ import os
 import numpy as np
 import data_helpers
 
-data_path = './data/aclImdb/'
+data_path = './data/'
 vocab_path = os.path.join(data_path,'imdb.vocab')
 train_path = os.path.join(data_path,'train')
 test_path = os.path.join(data_path,'test')
-train_pos_vals = [f for f in os.listdir(os.path.join(train_path,'pos'))]
-train_neg_vals = [f for f in os.listdir(os.path.join(train_path,'neg'))]
-test_pos_vals = [f for f in os.listdir(os.path.join(test_path,'pos'))]
-test_neg_vals = [f for f in os.listdir(os.path.join(test_path,'neg'))]
 
 def read_dir(path,fns,outfile):
     """
@@ -31,20 +27,64 @@ def concat_data(data_path):
     read_dir(os.path.join(train_path,'neg'),train_neg_vals,os.path.join(data_path,'train_neg.txt'))
     read_dir(os.path.join(train_path,'pos'),train_pos_vals,os.path.join(data_path,'train_pos.txt'))    
 
-def write_list(li,outfile):
+def write_topwords(data,outfile):
+    top_words = data_helpers.get_topk_words(data)
+    print("Writing top words to %s"%outfile)
+
     with open(outfile,'w') as o:
-        for w in li:
+        for w in top_words:
             o.write("%s\n"%w)
-
-def save_topkwordsbi(p='./data/'):
-    train_text,y = data_helpers.load_data_and_labels()
-    top_words = data_helpers.get_topk_words(train_text)
-    write_list(top_words,os.path.join(p,'topkwords.txt'))
-    top_bi = data_helpers.get_topk_bigrams(train_text)
-    write_list(top_bi,os.path.join(p,'topkbi.txt'))
+    return top_words
 
 
- if __name__=='__main__':
-    save_topkwordsbi()
+
+
+def write_datatopk(data,topkwords,outfile):
+    print("Writing filtered data to%s"%outfile)
+    print("%s lines"%len(data))
+    with open(outfile,'w') as o:
+        for s in data:
+            curr = s
+            for w in s.split(" "):
+                if w not in topkwords:
+                    o.write("<oov> ")
+                else:
+                    o.write("%s "%w)
+            o.write("\n")
+
+
+
+def save_topkwords(p='./data/'):
+    positive_examples = list(open("./data/train_pos.txt", "r").readlines())
+    positive_examples = [s.strip() for s in positive_examples]
+    negative_examples = list(open("./data/train_neg.txt", "r").readlines())
+    negative_examples = [s.strip() for s in negative_examples]
+    train_text = positive_examples+negative_examples
+    top_words = write_topwords(train_text,os.path.join(p,'topkwords.txt'))
+    write_datatopk(positive_examples,top_words,'data/train_pos_top.txt')
+    write_datatopk(negative_examples,top_words,'data/train_neg_top.txt')
+
+
+def topk_testdata(p="./data/"):
+    """
+    filter testing data on top 10000 words
+    """
+    positive_examples = list(open("./data/test_pos.txt", "r").readlines())
+    positive_examples = [s.strip() for s in positive_examples]
+    negative_examples = list(open("./data/test_neg.txt", "r").readlines())
+    negative_examples = [s.strip() for s in negative_examples]
+    write_datatopk(positive_examples,top_words,'data/test_pos_top.txt')
+    write_datatopk(negative_examples,top_words,'data/test_neg_top.txt')
+
+if __name__=='__main__':
+    try:
+        train_pos_vals = [f for f in os.listdir(os.path.join(train_path,'pos'))]
+        train_neg_vals = [f for f in os.listdir(os.path.join(train_path,'neg'))]
+        test_pos_vals = [f for f in os.listdir(os.path.join(test_path,'pos'))]
+        test_neg_vals = [f for f in os.listdir(os.path.join(test_path,'neg'))]
+    except OSError:
+        print "Some paths not found"
     #concat_data(data_path)
+    #save_topkwords()
+    topk_testdata()
 

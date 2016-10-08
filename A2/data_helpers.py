@@ -1,4 +1,5 @@
 import numpy as np
+from itertools import izip, islice
 import re
 import itertools
 from collections import Counter
@@ -81,15 +82,15 @@ def add_ood(data, topkwords):
     return data_top
 
 
-def load_data_and_labels():
+def load_data_and_labels(posfn,negfn):
     """
     Loads MR polarity data from files, splits the data into words and generates labels.
     Returns split sentences and labels.
     """
     # Load data from files
-    positive_examples = list(open("./data/rt-polaritydata/rt-polarity.pos", "r").readlines())
+    positive_examples = list(open(negfn, "r").readlines())
     positive_examples = [s.strip() for s in positive_examples]
-    negative_examples = list(open("./data/rt-polaritydata/rt-polarity.neg", "r").readlines())
+    negative_examples = list(open(posfn, "r").readlines())
     negative_examples = [s.strip() for s in negative_examples]
     # Split by words
     x_text = positive_examples + negative_examples
