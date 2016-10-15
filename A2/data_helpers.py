@@ -25,45 +25,70 @@ def clean_str(string):
     string = re.sub(r"\s{2,}", " ", string)
     return string.strip().lower()
 
-def split_data(data,labels,val_pct=0.2,test_pct=0.2):
+def split_data(data,labels,val_pct=0.2):
     shuffle = np.random.seed(10)
     shuffle_ind = np.random.permutation(np.arange(len(labels)))
     data_shuf = data[shuffle_ind]
     label_shuf = labels[shuffle_ind]
     
     val_n = int(len(labels)*val_pct)
-    test_n = int(len(labels)*test_pct)
-    c = val_n+test_n
     
     val_data,val_labels = data_shuf[:val_n],label_shuf[:val_n]
-    test_data,test_labels = data_shuf[val_n:val_n+test_n],label_shuf[val_n:val_n+test_n]
-    train_data,train_labels = data_shuf[val_n+test_n:],label_shuf[val_n+test_n:]
-    return (val_data,val_labels),(test_data,test_labels),(train_data,train_labels)
+    train_data,train_labels = data_shuf[val_n:],label_shuf[val_n:]
+    return (val_data,val_labels),(train_data,train_labels)
 
 def get_bigram_cutoff(data,k=2000):
     words = (" ").join(data).split(" ")
     c = Counter(izip(words, islice(words, 1, None)))
     common_bi = c.most_common(k)
     return common_bi[-1][1]
-    
-def bigram_feats(data,cutoff):
-    row_split = [r.split(" ") for r in x_t]
-    m = [zip(r, r[1:]) for r in row_split]
-    
-    bigrammed = []
+
+def get_bigrams_above_cutoff(data,cutoff):
     words = (" ").join(data).split(" ")
     c = Counter(izip(words, islice(words, 1, None)))
-    x_bi = [zip(s, s[1:]) for s in words]
-    for r in m:
-        r_bi = [bi for bi in r if c[bi]>cutoff]
-        bigrammed.append(r_bi)
-    return bigrammed
+    # get bigrams above cutoff
+    cutoff_bigrams = [k for k,v in c.iteritems() if v>cutoff]
+    return cutoff_bigrams
+
+def load_bigram_feats(posfn,negfn):
+    # assumes everything is in same order as data
+    pos_bigrams = load_bigrams_file(posfn)
+    neg_bigrams = load_bigrams_file(negfn)
+    all_bigrams = pos_bigrams+neg_bigrams
+    return all_bigrams
+
+def load_bigrams_file(path):
+    bigrams=[]
+    with open(path,'r') as o:
+        for l in o.readlines():
+            l = tuple(l.strip("\n").split(" "))
+            bigrams.append(l)
+    return bigrams
+
+    
+def bigram_feats(data,bigrams_list):
+    """
+    bigrams_list: list with the bigrams we want to use
+    """
+    row_split = [r.split(" ") for r in data]
+    m = [zip(r, r[1:]) for r in row_split]
+    r_bi = [[bi for bi in r if bi in bigrams_list] for r in m]
+    return r_bi
 
 def get_topk_words(data,k=10000):
     data_concat = (" ").join(data).split(" ")
     word_counts = Counter(data_concat)
     common_words = ([c[0] for c in word_counts.most_common(k)])
     return common_words
+
+def load_bigrams_file(path):
+    bigrams = []
+    with open(path) as o:
+        for line in o.readlines():
+            line = line.strip("\n").split("$$$")
+            bigrams.append(line)
+    return bigrams
+
 
 def get_topk_bigrams(data,k=2000):
     words = (" ").join(data).split(" ")
@@ -108,7 +133,7 @@ def batch_iter(data, batch_size, num_epochs, shuffle=True):
     """
     data = np.array(data)
     data_size = len(data)
-    num_batches_per_epoch = int(len(data)/batch_size) + 1
+    num_batches_per_epoch = int(len(data)/batch_size)
     for epoch in range(num_epochs):
         # Shuffle the data at each epoch
         if shuffle:
