@@ -72,7 +72,14 @@ def bigram_feats(data,bigrams_list):
     """
     row_split = [r.split(" ") for r in data]
     m = [zip(r, r[1:]) for r in row_split]
+    #words = (" ").join(data).split(" ")
+    #c = Counter(izip(words, islice(words, 1, None)))
+    #x_bi = [zip(s, s[1:]) for s in words]
     r_bi = [[bi for bi in r if bi in bigrams_list] for r in m]
+    #for r in m:
+        #print(r)
+    #    r_bi = [bi for bi in r if bi in bigrams_list]
+    #    bigrammed.append(r_bi)
     return r_bi
 
 def get_topk_words(data,k=10000):

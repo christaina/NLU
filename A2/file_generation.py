@@ -143,6 +143,7 @@ if __name__=='__main__':
     te_pos_bi = pa(datap,'te_pos_bi.txt')
     te_neg_bi = pa(datap,'te_neg_bi.txt')
 
+    """
     concat_set(tr_pos_dir,train_pos)
     concat_set(tr_neg_dir,train_neg)
     concat_set(te_pos_dir,test_pos)
@@ -155,6 +156,7 @@ if __name__=='__main__':
     write_datatopk(train_neg,topkwords,outfile=tr_neg_top)
     write_datatopk(test_pos,topkwords,outfile=te_pos_top)
     write_datatopk(test_neg,topkwords,outfile=te_neg_top)
+    """
 
     write_data_bigrams(tr_pos_top,bigrams,outfile=tr_pos_bi)
     write_data_bigrams(tr_neg_top,bigrams,outfile=tr_neg_bi)

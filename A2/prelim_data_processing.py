@@ -66,7 +66,7 @@ def save_topkwords(p='./data/'):
     negative_examples = list(open(data_path+"train_neg.txt", "r").readlines())
     negative_examples = [s.strip() for s in negative_examples]
     train_text = positive_examples+negative_examples
-    top_words = set(write_topwords(train_text,os.path.join(p,'topkwords.txt')))
+    top_words = write_topwords(train_text,os.path.join(p,'topkwords.txt'))
     write_datatopk(positive_examples,top_words,data_path+'train_pos_top.txt')
     write_datatopk(negative_examples,top_words,data_path+'train_neg_top.txt')
 

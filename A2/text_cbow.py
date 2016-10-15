@@ -6,11 +6,11 @@ class TextCBOW(object):
     """
     Using CBOW to clasify text
     """
-
     def __init__(
       self, sequence_length, num_classes, vocab_size,
       embedding_size, l2_reg_lambda=0.0):
 
+        # Placeholders for input, output and dropout (which you need to implement!!!!)
         self.input_x = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")
         self.input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")
 
@@ -22,15 +22,13 @@ class TextCBOW(object):
             W = tf.Variable(
                 tf.random_uniform([vocab_size, embedding_size], -1.0, 1.0),
                 name="W")
-            # ignore padding
-            flat_mask = tf.greater(self.input_x,0)
-            flat_mask = tf.cast(flat_mask,tf.float32)
-            self.mask = tf.expand_dims(flat_mask,[-1])
             self.embedded_chars = tf.nn.embedding_lookup(W, self.input_x)
-            self.emb_masked = tf.mul(self.embedded_chars,self.mask)
 
-        self.emb_masked = tf.mul(self.embedded_chars,self.mask)
-        self.projection = tf.reduce_mean(self.emb_masked,reduction_indices=1)
+        self.projection = tf.reduce_mean(self.embedded_chars,reduction_indices=1)
+
+        # Add dropout
+        ###############add your code here################
+        #hint: you need to add dropout on self.h_pool_flat with tf.nn.dropout()
 
         # Final (unnormalized) scores and predictions
         with tf.name_scope("output"):

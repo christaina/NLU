@@ -16,7 +16,6 @@ from tensorflow.contrib import learn
 tf.flags.DEFINE_integer("embedding_dim", 64, "Dimensionality of character embedding (default: 128)")
 tf.flags.DEFINE_integer("cutoff", 50, "When to cut off the sentence (default: 50)")
 tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regularizaion lambda (default: 0.0)")
-tf.flags.DEFINE_float("lr", 1e-3, "learning rate")
 
 # Training parameters
 tf.flags.DEFINE_integer("batch_size", 32, "Batch Size (default: 64)")
@@ -31,7 +30,6 @@ tf.flags.DEFINE_string("n","time","Use bigrams")
 
 FLAGS = tf.flags.FLAGS
 FLAGS._parse_flags()
-print("")
 print("\nParameters:")
 for attr, value in sorted(FLAGS.__flags.items()):
     print("{}={}".format(attr.upper(), value))
@@ -39,10 +37,8 @@ print("")
 
 train_pos = './data/aclImdb/train_pos_top.txt'
 train_neg = './data/aclImdb/train_neg_top.txt'
-bigram_pos = './data/aclImdb/train_pos_bi.txt'
-bigram_neg = './data/aclImdb/train_neg_bi.txt'
-
-bigrams_file = './data/aclImdb/bigrams.txt'
+bigram_pos = './data/aclImdb/train_pos_top.txt'
+bigram_neg = './data/aclImdb/train_neg_top.txt'
 
 
 # Data Preparatopn
@@ -50,7 +46,7 @@ bigrams_file = './data/aclImdb/bigrams.txt'
 
 # Load data
 print("Loading data...")
-x_text, y = data_helpers.load_data_and_labels(train_pos,train_neg)
+x_text, y = data_helpers.load_data_and_labels('data/aclImdb/train_pos_top.txt','data/aclImdb/train_neg_top.txt')
 
 # Cut off sentences
 x_text = [(" ").join(x.split(" ")[:FLAGS.cutoff]) for x in x_text]
@@ -59,16 +55,18 @@ max_document_length = max([len(x.split(" ")) for x in x_text])
 vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
 x = np.array(list(vocab_processor.fit_transform(x_text)))
 vocab_size = len(vocab_processor.vocabulary_)
+print(x.shape)
 
 if (FLAGS.bigrams==True):
-    bigrams_features = data_helpers.load_bigram_feats(bigram_pos,bigram_neg)
-    bigrams_list = (data_helpers.load_bigrams_file(bigrams_file))
+    bigrams_features = data_helpers.load_bigram_feats('./data/aclImdb/train_pos_bi.txt','./data/aclImdb/train_neg_bi.txt')
+    bigrams_list = (data_helpers.load_bigrams_file("./data/aclImdb/bigrams.txt"))
     bigrams_list = [" ".join(i) for i in bigrams_list]
     #bigrams_list = set(bigrams_list)
     vocab_size = vocab_size+len(bigrams_list)+1
     bigram_st = len(vocab_processor.vocabulary_)+1
     max_bigram_length = max([len(bi) for bi in bigrams_features])
     bigrams_mat = np.empty([len(bigrams_features),max_bigram_length])
+    print(bigrams_mat.shape)
 
     bigrams_dict = {}
 
@@ -76,10 +74,18 @@ if (FLAGS.bigrams==True):
         for j,w in enumerate(r):
             if w == "":
                 bigrams_mat[i][j]=0
+            #if w not in set(bigrams_dict.keys()):
+            #    bigrams_dict[w] = bigram_st
+            #    bigram_st+=1
             else:
 
                 bigrams_mat[i][j]=bigrams_list.index(w)+bigram_st
     x = np.concatenate((x,bigrams_mat),axis=1)
+    #x = np.vstack((x,bigrams_mat))
+
+    # create own dictionary on these
+    # once have values, append to end of transformed data
+    # update vocab length values
 
 val,train = data_helpers.split_data(x,y)
 x_train,y_train = train
@@ -103,12 +109,13 @@ with tf.Graph().as_default():
             sequence_length=x_train.shape[1],
             num_classes=2,
             vocab_size=vocab_size,
+            #vocab_size=bigram_st,
             embedding_size=FLAGS.embedding_dim,
             l2_reg_lambda=FLAGS.l2_reg_lambda)
 
         # Define Training procedure
         global_step = tf.Variable(0, name="global_step", trainable=False)
-        optimizer = tf.train.AdamOptimizer(FLAGS.lr)
+        optimizer = tf.train.AdamOptimizer(1e-3)
         grads_and_vars = optimizer.compute_gradients(model.loss)
         train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
 
@@ -170,7 +177,6 @@ with tf.Graph().as_default():
                 [train_op, global_step, train_summary_op, model.loss, model.accuracy],
                 feed_dict)
             time_str = datetime.datetime.now().isoformat()
-
             print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
             train_summary_writer.add_summary(summaries, step)
 
