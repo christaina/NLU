@@ -15,7 +15,7 @@ from tensorflow.contrib import learn
 # Eval Parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
 tf.flags.DEFINE_integer("cutoff", 50, "When to cut off sentence")
-tf.flags.DEFINE_string("checkpoint_dir", "./runs/nobi_c50_e30/checkpoints", "Checkpoint directory from training run")
+tf.flags.DEFINE_string("checkpoint_dir", "./runs/bi200_50/checkpoints", "Checkpoint directory from training run")
 tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
 
 # Misc Parameters

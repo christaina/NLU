@@ -97,8 +97,8 @@ if __name__=='__main__':
         test_neg_vals = [f for f in os.listdir(os.path.join(test_path,'neg'))]
     except OSError:
         print "Some paths not found"
-    #concat_data(data_path)
-    #save_topkwords()
-    #topk_testdata()
-    write_top_bigrams(neg_path=train_top_neg,pos_path=train_top_pos,outfile='./data/aclImdb/bigrams.txt',cutoff=300)
+    concat_data(data_path)
+    save_topkwords()
+    topk_testdata()
+    write_top_bigrams(neg_path=train_top_neg,pos_path=train_top_pos,outfile='./data/aclImdb/bigrams.txt',cutoff=250)
 

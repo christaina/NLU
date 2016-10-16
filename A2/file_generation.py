@@ -143,28 +143,24 @@ if __name__=='__main__':
     te_pos_bi = pa(datap,'te_pos_bi.txt')
     te_neg_bi = pa(datap,'te_neg_bi.txt')
 
-    """
+    # concat data into one file 
     concat_set(tr_pos_dir,train_pos)
     concat_set(tr_neg_dir,train_neg)
     concat_set(te_pos_dir,test_pos)
     concat_set(te_neg_dir,test_neg)
 
+    # write file with top words and bigrams
     write_top_words(pos_path=train_pos,neg_path=train_neg,outfile=topkwords)
     write_top_bigrams(pos_path=train_pos,neg_path=train_neg,outfile=bigrams,cutoff=300)
 
+    # write whole dataset with top 10000 words filtered out
     write_datatopk(train_pos,topkwords,outfile=tr_pos_top)
     write_datatopk(train_neg,topkwords,outfile=tr_neg_top)
     write_datatopk(test_pos,topkwords,outfile=te_pos_top)
     write_datatopk(test_neg,topkwords,outfile=te_neg_top)
-    """
-
+    
+    # write bigram features to file
     write_data_bigrams(tr_pos_top,bigrams,outfile=tr_pos_bi)
     write_data_bigrams(tr_neg_top,bigrams,outfile=tr_neg_bi)
     write_data_bigrams(te_pos_top,bigrams,outfile=te_pos_bi)
     write_data_bigrams(te_neg_top,bigrams,outfile=te_neg_bi)
-
-    #concat_data(data_path)
-    #save_topkwords()
-    #topk_testdata()
-    #write_top_bigrams(neg_path=train_top_neg,pos_path=train_top_pos,outfile='./data/aclImdb/bigrams.txt',cutoff=300)
-
