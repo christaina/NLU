@@ -14,14 +14,14 @@ from tensorflow.contrib import learn
 
 # Eval Parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_integer("cutoff", 50, "When to cut off sentence")
-tf.flags.DEFINE_string("checkpoint_dir", "./runs/bi200_50/checkpoints", "Checkpoint directory from training run")
+tf.flags.DEFINE_integer("cutoff", 300, "When to cut off sentence")
+tf.flags.DEFINE_string("checkpoint_dir", "./runs/best_ceb545/checkpoints", "Checkpoint directory from training run")
 tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
 
 # Misc Parameters
 tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
 tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
-tf.flags.DEFINE_boolean("bigrams", False, "Use bigram features or not")
+tf.flags.DEFINE_boolean("bigrams", True, "Use bigram features or not")
 
 test_pos = './data/aclImdb/te_pos_top.txt'
 test_neg = './data/aclImdb/te_neg_top.txt'

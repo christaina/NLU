@@ -1,3 +1,7 @@
+To generate my best results you just need to run file_generation.py (with the proper paths), then train.py and eval.py. The inputs for the latter two are configured to my best model (including the directory where the model is saved). See below for some more details.
+
+----------------
+
 DATA PRE-PROCESSING
 
 To pre-process the data run file_generation.py

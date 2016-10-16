@@ -13,8 +13,8 @@ from tensorflow.contrib import learn
 # ==================================================
 
 # Model Hyperparameters
-tf.flags.DEFINE_integer("embedding_dim", 64, "Dimensionality of character embedding (default: 128)")
-tf.flags.DEFINE_integer("cutoff", 50, "When to cut off the sentence (default: 50)")
+tf.flags.DEFINE_integer("embedding_dim", 10, "Dimensionality of character embedding (default: 128)")
+tf.flags.DEFINE_integer("cutoff", 300, "When to cut off the sentence (default: 50)")
 tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regularizaion lambda (default: 0.0)")
 
 # Training parameters
@@ -26,8 +26,8 @@ tf.flags.DEFINE_integer("checkpoint_every", 200, "Save model after this many ste
 # Misc Parameters
 tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
 tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
-tf.flags.DEFINE_boolean("bigrams",False,"Use bigrams")
-tf.flags.DEFINE_string("n","time","Use bigrams")
+tf.flags.DEFINE_boolean("bigrams",True,"Use bigrams")
+tf.flags.DEFINE_string("n","best_ceb545","Use bigrams")
 
 FLAGS = tf.flags.FLAGS
 FLAGS._parse_flags()
